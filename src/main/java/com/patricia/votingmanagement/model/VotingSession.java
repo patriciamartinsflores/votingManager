@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class VotingSession {
 	
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;

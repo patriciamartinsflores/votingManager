@@ -38,15 +38,8 @@ public class ProposalService {
 		.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 	}
 	
-	public void validateProposalExists(Long id) {
-		if(proposalRepository.findById(id).isEmpty()) { 
-			throw new NotFoundException(id, "Proposal");
-		}
-	}
-	
 	public Proposal getProposalById(Long id) {
-		validateProposalExists(id);
-		return proposalRepository.findById(id).get();
+		return proposalRepository.findById(id).orElseThrow(() -> new NotFoundException(id, "Proposal"));
 	}
 	
 	@Transactional

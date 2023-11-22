@@ -19,6 +19,7 @@ import com.patricia.votingmanagement.enums.VoteValueEnum;
 import com.patricia.votingmanagement.exception.InvalidRequestException;
 import com.patricia.votingmanagement.exception.NotAuthorizedException;
 import com.patricia.votingmanagement.exception.NotFoundException;
+import com.patricia.votingmanagement.model.Proposal;
 import com.patricia.votingmanagement.model.VotingSession;
 import com.patricia.votingmanagement.repository.VotingSessionRepository;
 
@@ -46,12 +47,12 @@ public class SessionService {
 	
 	@Transactional
 	public VotingSessionDTO openNewSession(NewVotingSessionDTO newVotingSessionDTO){
-		proposalService.validateProposalExists(newVotingSessionDTO.proposalId());
+		Proposal proposal = proposalService.getProposalById(newVotingSessionDTO.proposalId());
 		
 		VotingSession newSession = new VotingSession();
 		
 		newSession.setSessionTime(validateAndReturnSessionTime(newVotingSessionDTO.sessionTime()));
-		newSession.setProposalId(newVotingSessionDTO.proposalId());	
+		newSession.setProposalId(proposal.getId());	
 		newSession.setStatus(SessionStatusEnum.IN_PROGRESS);
 		newSession.setSessionStart(Timestamp.valueOf(LocalDateTime.now()));
 		VotingSession session = votingSessionRepository.save(newSession);
@@ -61,17 +62,15 @@ public class SessionService {
 		return votingSessionMapper.toDTO(session);
 	}
 	
-	private VotingSession validateVotingSessionExists(Long id) {
-		java.util.Optional<VotingSession> session = votingSessionRepository.findById(id);
-		if(session.isEmpty()) { 
-			throw new NotFoundException(id, "Session");
-		}
-		if(!Objects.equals(session.get().getStatus(), SessionStatusEnum.IN_PROGRESS)) {
-			throw new NotAuthorizedException("The session with id: "+session.get().getId()+" is not accepting votes. Status: " 
+	public VotingSession validateVotingSessionExists(Long id) {
+		VotingSession session = votingSessionRepository.findById(id).orElseThrow(() -> new NotFoundException(id, "Session"));
+
+		if(!Objects.equals(session.getStatus(), SessionStatusEnum.IN_PROGRESS)) {
+			throw new NotAuthorizedException("The session with id: "+session.getId()+" is no longer accepting votes. Status: " 
 					+ SessionStatusEnum.SESSION_ENDED.getDescription());
 	
 		} 
-		return session.get();
+		return session;
 	}
 
 	
@@ -85,7 +84,7 @@ public class SessionService {
 	
 	private void validateVote(NewVoteDTO voteDTO) {
 		VotingSession session = validateVotingSessionExists(voteDTO.sessionId());
-		proposalService.validateProposalExists(session.getProposalId());
+		Proposal proposal = proposalService.getProposalById(session.getProposalId());
 		voteService.checkIfAssociateAlreadyVoted(voteDTO.associateId(), voteDTO.sessionId());
 		associateService.validateAssociateExists(voteDTO.associateId());
 	}
@@ -130,15 +129,12 @@ public class SessionService {
 	}
 	
 	public SessionResultDTO getVotingResultsBySessionId(Long id) {
-		java.util.Optional<VotingSession> session = votingSessionRepository.findById(id);
-		if(session.isEmpty()) { 
-			throw new NotFoundException(id, "Session");
-		}
-		VotingSession entity = session.get();
-		if(!entity.getStatus().equals(SessionStatusEnum.SESSION_ENDED)) {
+		VotingSession session = votingSessionRepository.findById(id).orElseThrow(() -> new NotFoundException(id, "Session"));
+
+		if(!session.getStatus().equals(SessionStatusEnum.SESSION_ENDED)) {
 			throw new NotAuthorizedException("Error: cannot fetch result because session is stil ongoing.");
 		}
-		return votingSessionMapper.toSessionResultDTO(entity, proposalService.getProposalById(entity.getProposalId()).getStatus());
+		return votingSessionMapper.toSessionResultDTO(session, proposalService.getProposalById(session.getProposalId()).getStatus());
 	}
 	
 }
