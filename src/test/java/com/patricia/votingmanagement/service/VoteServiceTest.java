@@ -40,8 +40,8 @@ class VoteServiceTest {
 	
 	@BeforeEach
 	public void setUp() {
-		vote = new Vote(Long.valueOf(1),Long.valueOf(1),VoteValueEnum.NO);
-		voteDTO = new NewVoteDTO(vote.getAssociateId(), vote.getSessionId(), vote.getVoteValue());
+		//vote = new Vote(Long.valueOf(1),Long.valueOf(1),VoteValueEnum.NO);
+		//voteDTO = new NewVoteDTO(vote.getAssociateId(), vote.getSessionId(), vote.getVoteValue());
 	}
 	
 	@Test

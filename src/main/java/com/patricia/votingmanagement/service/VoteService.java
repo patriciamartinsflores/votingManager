@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.patricia.votingmanagement.dto.NewVoteDTO;
+import com.patricia.votingmanagement.enums.VoteValueEnum;
 import com.patricia.votingmanagement.exception.NotAuthorizedException;
 import com.patricia.votingmanagement.model.Vote;
 import com.patricia.votingmanagement.repository.VoteRepository;
@@ -23,8 +24,12 @@ public class VoteService {
 	
 	@Transactional
 	public void saveNewVote(NewVoteDTO voteDTO) {
-		Vote vote = new Vote(voteDTO.associateId(), voteDTO.sessionId(), voteDTO.voteValueEnum());
+		Vote vote = new Vote();
+		vote.setSessionId(voteDTO.sessionId());
+		vote.setAssociateId(voteDTO.associateId());
+		vote.setVoteValue(validateVoteValue(voteDTO.voteValue()));
 		voteRepository.save(vote);
+		
 	}
 	
 	public void checkIfAssociateAlreadyVoted(Long associateId, Long sessionId) {
@@ -35,6 +40,13 @@ public class VoteService {
 	
 	public List<Vote> findAllBySessionId(Long sessionId) {
 		return voteRepository.findAllBySessionId(sessionId);
+	}
+	
+	private VoteValueEnum validateVoteValue(int voteValue) {
+		if (voteValue == VoteValueEnum.NO.getValue()) 
+			return VoteValueEnum.NO;
+
+			return VoteValueEnum.YES;
 	}
 	
 }

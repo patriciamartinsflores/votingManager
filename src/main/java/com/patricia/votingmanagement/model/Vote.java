@@ -24,7 +24,7 @@ public class Vote {
 	@NotNull
 	private Long sessionId;
 	
-	@NotNull @ValueOfEnum(enumClass = VoteValueEnum.class)
+	@NotNull 
 	private VoteValueEnum voteValue;
 	
 	public Vote() {
