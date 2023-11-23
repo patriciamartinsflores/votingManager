@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.patricia.votingmanagement.dto.NewVoteDTO;
 import com.patricia.votingmanagement.enums.VoteValueEnum;
+import com.patricia.votingmanagement.exception.InvalidRequestException;
 import com.patricia.votingmanagement.exception.NotAuthorizedException;
 import com.patricia.votingmanagement.model.Vote;
 import com.patricia.votingmanagement.repository.VoteRepository;
@@ -45,8 +46,9 @@ public class VoteService {
 	private VoteValueEnum validateVoteValue(int voteValue) {
 		if (voteValue == VoteValueEnum.NO.getValue()) 
 			return VoteValueEnum.NO;
-
+		else if (voteValue == VoteValueEnum.YES.getValue()) 
 			return VoteValueEnum.YES;
+		else throw new InvalidRequestException("Error: vote values can only be YES or NO.");
 	}
 	
 }
