@@ -59,6 +59,10 @@ public class Proposal {
 	public void setStatus(ProposalStatusEnum status) {
 		this.status = status;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
 
 }

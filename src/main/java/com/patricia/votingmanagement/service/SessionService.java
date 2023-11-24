@@ -24,10 +24,8 @@ import com.patricia.votingmanagement.model.VotingSession;
 import com.patricia.votingmanagement.repository.VotingSessionRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class SessionService {
 	
 	@Autowired
@@ -74,17 +72,17 @@ public class SessionService {
 	}
 
 	
-	private Long validateAndReturnSessionTime(Long sessionTime) {
+	public Long validateAndReturnSessionTime(Long sessionTime) {
 		if(Objects.isNull(sessionTime)) {
 			return Long.valueOf(60);		
-		} else if (Long.compare(sessionTime, Long.valueOf(0)) < 0 ) {
+		} else if (Long.compare(sessionTime, 0) <= 0 ) {
 			throw new InvalidRequestException("Session time must be over 0 seconds.");
 		} else return sessionTime;
 	}
 	
 	private void validateVote(NewVoteDTO voteDTO) {
 		VotingSession session = validateVotingSessionExists(voteDTO.sessionId());
-		Proposal proposal = proposalService.getProposalById(session.getProposalId());
+		proposalService.validateProposalById(session.getProposalId());
 		voteService.checkIfAssociateAlreadyVoted(voteDTO.associateId(), voteDTO.sessionId());
 		associateService.validateAssociateExists(voteDTO.associateId());
 	}

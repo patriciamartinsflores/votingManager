@@ -1,7 +1,6 @@
 package com.patricia.votingmanagement.model;
 
 import com.patricia.votingmanagement.enums.VoteValueEnum;
-import com.patricia.votingmanagement.enums.validation.ValueOfEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

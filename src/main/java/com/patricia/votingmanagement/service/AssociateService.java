@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import com.patricia.votingmanagement.exception.NotFoundException;
 import com.patricia.votingmanagement.repository.AssociateRepository;
 
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class AssociateService {
 
 	@Autowired

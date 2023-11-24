@@ -22,8 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.patricia.votingmanagement.model.Proposal;
 import com.patricia.votingmanagement.repository.ProposalRepository;
+import com.patricia.votingmanagement.dto.NewProposalDTO;
 import com.patricia.votingmanagement.dto.ProposalDTO;
 import com.patricia.votingmanagement.dto.mapper.ProposalMapper;
+import com.patricia.votingmanagement.enums.ProposalStatusEnum;
 import com.patricia.votingmanagement.exception.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,14 +40,16 @@ class ProposalServiceTest {
 	
 	@Mock 
 	ProposalMapper proposalMapper;
-	
+		
 	Proposal proposal;
 	ProposalDTO proposalDto;
+	NewProposalDTO newProposalDTO;
 	
 	@BeforeEach
 	public void setUp() {
 		proposal = new Proposal("test proposal");
 		proposalDto = new ProposalDTO(proposal.getId(), proposal.getDescription(), proposal.getStatus().getDescription());
+		newProposalDTO = new NewProposalDTO(proposal.getDescription());
 	}
 	
 	@Test
@@ -77,5 +81,60 @@ class ProposalServiceTest {
 		assertEquals(proposals, Collections.singletonList(proposalDto));
 		verify(proposalRepository).findAll();
 		verifyNoMoreInteractions(proposalRepository);
+	}
+	
+	@Test
+	void mustSetProposalAsAcceptedIfMoreYesVotes() {
+		when(proposalRepository.findById(proposal.getId())).thenReturn(Optional.of(proposal));
+		proposalService.updateProposalResults(proposal.getId(), Long.valueOf(2), Long.valueOf(1));
+		verify(proposalRepository).findById(proposal.getId());
+		assertEquals(ProposalStatusEnum.PROPOSAL_ACCEPTED,proposal.getStatus());
+		verify(proposalRepository).saveAndFlush(proposal);
+	}
+	
+	@Test
+	void mustSetProposalAsRejectedIfMoreNoVotes() {
+		when(proposalRepository.findById(proposal.getId())).thenReturn(Optional.of(proposal));
+		proposalService.updateProposalResults(proposal.getId(), Long.valueOf(1), Long.valueOf(2));
+		verify(proposalRepository).findById(proposal.getId());
+		assertEquals(ProposalStatusEnum.PROPOSAL_REJECTED,proposal.getStatus());
+		verify(proposalRepository).saveAndFlush(proposal);
+	}
+	
+	@Test
+	void mustSetProposalAsTieIfEqualNumberOfYesAndNoVotes() {
+		when(proposalRepository.findById(proposal.getId())).thenReturn(Optional.of(proposal));
+		proposalService.updateProposalResults(proposal.getId(), Long.valueOf(0), Long.valueOf(0));
+		verify(proposalRepository).findById(proposal.getId());
+		assertEquals(ProposalStatusEnum.TIE,proposal.getStatus());
+		verify(proposalRepository).saveAndFlush(proposal);
+	}
+	
+	@Test
+	void mustNotThrowExceptionWhenIdValidatedDoesExist() {
+		when(proposalRepository.existsById(proposal.getId())).thenReturn(true);
+		assertDoesNotThrow(() -> {
+			proposalService.validateProposalById(proposal.getId());
+		 });
+		verify(proposalRepository).existsById(proposal.getId());
+		verifyNoMoreInteractions(proposalRepository);
+	}
+	
+	@Test
+	void mustThrowExceptionWhenIdValidatedDoesNotExist() {
+		when(proposalRepository.existsById(proposal.getId())).thenReturn(false);
+		final NotFoundException ex = assertThrows(NotFoundException.class, () -> {
+			proposalService.validateProposalById(proposal.getId());
+		});
+		assertThat(ex, notNullValue());
+		verify(proposalRepository).existsById(proposal.getId());
+		verifyNoMoreInteractions(proposalRepository);
+	}
+	
+	@Test
+	void mustCreateNewProposalWithNoErros() {
+		assertDoesNotThrow(() -> {
+			proposalService.newProposal(newProposalDTO);
+		 });
 	}
 }

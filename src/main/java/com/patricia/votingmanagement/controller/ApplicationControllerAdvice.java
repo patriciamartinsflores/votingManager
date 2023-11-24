@@ -1,5 +1,7 @@
 package com.patricia.votingmanagement.controller;
 
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -61,7 +63,7 @@ public class ApplicationControllerAdvice {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        if (ex != null && ex.getRequiredType() != null) {
+        if (Objects.nonNull(ex) && Objects.nonNull(ex.getRequiredType())) {
             String type = ex.getRequiredType().getName();
             String[] typeParts = type.split("\\.");
             String typeName = typeParts[typeParts.length - 1];

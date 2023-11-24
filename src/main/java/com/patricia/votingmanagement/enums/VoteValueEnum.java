@@ -16,18 +16,9 @@ public enum VoteValueEnum {
 		return value;
 	}
 
-	public void setValue(int value) {
-		this.value = value;
-	}
-
 	public String getDescription() {
 		return description;
 	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 
 	
 }

@@ -14,10 +14,8 @@ import com.patricia.votingmanagement.model.Proposal;
 import com.patricia.votingmanagement.repository.ProposalRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class ProposalService {
 
 	@Autowired	
@@ -26,6 +24,7 @@ public class ProposalService {
 	@Autowired
 	private ProposalMapper proposalMapper;
 	
+	@Transactional
 	public ProposalDTO newProposal(NewProposalDTO newProposalDTO) {
 		Proposal proposalEntity = new Proposal(newProposalDTO.description());
 		return proposalMapper.toDTO(proposalRepository.save(proposalEntity));
@@ -40,6 +39,11 @@ public class ProposalService {
 	
 	public Proposal getProposalById(Long id) {
 		return proposalRepository.findById(id).orElseThrow(() -> new NotFoundException(id, "Proposal"));
+	}
+	
+	public void validateProposalById(Long id) {
+		if (!proposalRepository.existsById(id))
+			throw new NotFoundException(id, "Proposal");
 	}
 	
 	@Transactional

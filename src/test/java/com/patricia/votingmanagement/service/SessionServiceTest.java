@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.patricia.votingmanagement.repository.VotingSessionRepository;
 import com.patricia.votingmanagement.enums.SessionStatusEnum;
+import com.patricia.votingmanagement.exception.InvalidRequestException;
 import com.patricia.votingmanagement.exception.NotFoundException;
 import com.patricia.votingmanagement.model.VotingSession;
 
@@ -43,6 +44,7 @@ class SessionServiceTest {
 		session.setProposalId(Long.valueOf(1));
 		session.setStatus(SessionStatusEnum.IN_PROGRESS);
 		session.setSessionStart(Timestamp.valueOf(LocalDateTime.now()));
+		session.setSessionTime(Long.valueOf(1));
 	}
 	
 	
@@ -66,5 +68,39 @@ class SessionServiceTest {
 		});
 
 		assertEquals(session,sessionService.validateVotingSessionExists(session.getId()));
+	}
+	
+	@Test
+	void MustThrowExceptionWhenSessionTimeNegative() {
+		final InvalidRequestException ex = assertThrows(InvalidRequestException.class, () -> {
+			sessionService.validateAndReturnSessionTime(Long.valueOf(-1));
+		});
+		
+		assertThat(ex, notNullValue());
+	}
+	
+	@Test
+	void MustThrowExceptionWhenSessionTimeZero() {
+		final InvalidRequestException ex = assertThrows(InvalidRequestException.class, () -> {
+			sessionService.validateAndReturnSessionTime(Long.valueOf(0));
+		});
+		
+		assertThat(ex, notNullValue());
+	}
+	
+	@Test
+	void MustReturnDesiredSessionTime() {
+		assertDoesNotThrow(() -> {
+			sessionService.validateAndReturnSessionTime(Long.valueOf(1));
+		});
+		assertEquals(sessionService.validateAndReturnSessionTime(Long.valueOf(1)),Long.valueOf(1));
+	}
+	
+	@Test
+	void MustReturn60SecondsWhenTimeIsNotFilled() {
+		assertDoesNotThrow(() -> {
+			sessionService.validateAndReturnSessionTime(null);
+		});
+		assertEquals(sessionService.validateAndReturnSessionTime(null),Long.valueOf(60));
 	}
 }

@@ -23,6 +23,7 @@ import com.patricia.votingmanagement.enums.VoteValueEnum;
 import com.patricia.votingmanagement.model.Vote;
 import com.patricia.votingmanagement.repository.VoteRepository;
 import com.patricia.votingmanagement.exception.NotAuthorizedException;
+import com.patricia.votingmanagement.exception.InvalidRequestException;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -40,14 +41,12 @@ class VoteServiceTest {
 	
 	@BeforeEach
 	public void setUp() {
-		//vote = new Vote(Long.valueOf(1),Long.valueOf(1),VoteValueEnum.NO);
-		//voteDTO = new NewVoteDTO(vote.getAssociateId(), vote.getSessionId(), vote.getVoteValue());
+		vote = new Vote(Long.valueOf(1),Long.valueOf(1),VoteValueEnum.NO);
+		voteDTO = new NewVoteDTO(vote.getAssociateId(), vote.getSessionId(), vote.getVoteValue().getValue());
 	}
 	
 	@Test
 	void mustSaveNewVote() {		
-		//when(new Vote(voteDTO.associateId(), voteDTO.sessionId(), voteDTO.voteValueEnum())).thenReturn(vote);		
-		//voteService.saveNewVote(voteDTO);
 		voteRepository.save(vote);
 		verify(voteRepository).save(vote);
 		verifyNoMoreInteractions(voteRepository);
@@ -79,7 +78,7 @@ class VoteServiceTest {
 	}
 	
 	@Test
-	void mustNotAllowNewVote() {
+	void mustAllowNewVote() {
 		when(voteRepository.existsBySessionIdAndAssociateId(vote.getSessionId(), vote.getAssociateId())).thenReturn(Boolean.FALSE);
 		
 		assertDoesNotThrow(() -> {
@@ -87,4 +86,29 @@ class VoteServiceTest {
 		});
 		
 	}
+	
+	@Test
+	void mustThrowExceptionWhenVoteIsNotYesOrNo() {
+		final InvalidRequestException ex = assertThrows(InvalidRequestException.class, () -> {
+			voteService.validateVoteValue(6);
+		});
+		assertThat(ex, notNullValue());
+	}
+	
+	@Test
+	void mustReturnEnumnWhenVoteIsYes() {
+		assertDoesNotThrow(() -> {
+			voteService.validateVoteValue(1);
+		});
+		assertEquals(VoteValueEnum.YES, voteService.validateVoteValue(1));
+	}
+	
+	@Test
+	void mustReturnEnumnWhenVoteIsNo() {
+		assertDoesNotThrow(() -> {
+			voteService.validateVoteValue(1);
+		});
+		assertEquals(VoteValueEnum.NO, voteService.validateVoteValue(0));
+	}
+	
 }

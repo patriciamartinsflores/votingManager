@@ -13,10 +13,8 @@ import com.patricia.votingmanagement.model.Vote;
 import com.patricia.votingmanagement.repository.VoteRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class VoteService {
 
 	@Autowired	
@@ -43,7 +41,7 @@ public class VoteService {
 		return voteRepository.findAllBySessionId(sessionId);
 	}
 	
-	private VoteValueEnum validateVoteValue(int voteValue) {
+	public VoteValueEnum validateVoteValue(int voteValue) {
 		if (voteValue == VoteValueEnum.NO.getValue()) 
 			return VoteValueEnum.NO;
 		else if (voteValue == VoteValueEnum.YES.getValue()) 
