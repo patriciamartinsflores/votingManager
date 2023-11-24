@@ -46,7 +46,7 @@ public class VoteService {
 			return VoteValueEnum.NO;
 		else if (voteValue == VoteValueEnum.YES.getValue()) 
 			return VoteValueEnum.YES;
-		else throw new InvalidRequestException("Error: vote values can only be YES or NO.");
+		throw new InvalidRequestException("Error: vote values can only be YES or NO.");
 	}
 	
 }
