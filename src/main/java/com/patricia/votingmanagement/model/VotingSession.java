@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 import com.patricia.votingmanagement.enums.SessionStatusEnum;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,18 +23,24 @@ public class VotingSession {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@NotNull
+	@Column(name = "session_id")
 	private Long id;
 	
+	@Column(name = "session_time")
 	private Long sessionTime;//desired session duration in seconds
 	
 	@NotNull
+	@Column(name = "proposal_id")
 	private Long proposalId;
 	
+	@Column(name = "session_status")
 	private SessionStatusEnum status;
 	
+	@Column(name = "session_start")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Timestamp sessionStart;	
 	
+	@Column(name = "session_end")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Timestamp sessionEnd;	
 	

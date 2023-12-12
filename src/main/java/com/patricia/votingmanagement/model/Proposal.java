@@ -19,15 +19,15 @@ public class Proposal {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@NotNull
-	@Column(name = "prp_id")
+	@Column(name = "proposal_id")
 	private Long id;
 	
-	@Column(name = "prp_description")
+	@Column(name = "proposal_description")
 	@NotNull
 	@Length(min = 10, max = 300)
 	private String description;
 	
-	@Column(name = "prp_status")
+	@Column(name = "proposal_status")
 	@NotNull
 	private ProposalStatusEnum status;
 	

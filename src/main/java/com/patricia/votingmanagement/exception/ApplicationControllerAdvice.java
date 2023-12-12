@@ -1,4 +1,4 @@
-package com.patricia.votingmanagement.controller;
+package com.patricia.votingmanagement.exception;
 
 import java.util.Objects;
 
@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-
-import com.patricia.votingmanagement.exception.InvalidRequestException;
-import com.patricia.votingmanagement.exception.NotAuthorizedException;
-import com.patricia.votingmanagement.exception.NotFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
